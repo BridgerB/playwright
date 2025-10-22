@@ -1,9 +1,3 @@
-import { exec } from "child_process";
-import { writeFileSync } from "fs";
-import { promisify } from "util";
-
-const execAsync = promisify(exec);
-
 async function testScreenshot() {
   console.log("Testing screenshot function...");
 
@@ -22,12 +16,12 @@ async function testScreenshot() {
 
   if (data.error) {
     console.error("Error:", data.error);
-    process.exit(1);
+    Deno.exit(1);
   }
 
   if (!data.screenshot) {
     console.error("No screenshot data received");
-    process.exit(1);
+    Deno.exit(1);
   }
 
   console.log("Screenshot received successfully!");
@@ -61,10 +55,13 @@ async function testScreenshot() {
 </html>`;
 
   const outputPath = "/tmp/screenshot-test.html";
-  writeFileSync(outputPath, html);
+  await Deno.writeTextFile(outputPath, html);
 
   console.log(`Opening screenshot in Chromium...`);
-  await execAsync(`chromium ${outputPath}`);
+  const command = new Deno.Command("chromium", {
+    args: [outputPath],
+  });
+  await command.output();
 }
 
 testScreenshot().catch(console.error);
