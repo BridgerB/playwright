@@ -47,10 +47,20 @@ export const screenshot = onRequest(
       }
 
       // Validate URL format
+      let parsedUrl;
       try {
-        new URL(url);
+        parsedUrl = new URL(url);
       } catch (e) {
         response.status(400).json({ error: "Invalid URL format" });
+        return;
+      }
+
+      // Only allow bridgerb.com
+      if (
+        parsedUrl.hostname !== "bridgerb.com" &&
+        parsedUrl.hostname !== "www.bridgerb.com"
+      ) {
+        response.status(403).json({ error: "Only bridgerb.com is allowed" });
         return;
       }
 
